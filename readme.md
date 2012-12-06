@@ -1,0 +1,1 @@
+Gaia is a daisyworld-type simulator made by John West. Right now, it doesn't do much except run a preprogramed "life" sim. Soon, hopefully, it will be a little more interactive.

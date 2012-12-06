@@ -1,0 +1,71 @@
+$land_no_life: rgb(50,50,0)
+$land_life: rgb(0,100,0)
+$water_no_life: rgb(0,0,100)
+$water_life: rgb(0,50,100)
+
+*
+  margin: 0
+  padding: 0
+  
+h1#primary-title
+  color: rgb(0,50,100)
+  font-family: "Fanwood"
+  font-size: 100px
+  font-weight: 400
+  line-height: 100px
+  margin: 25px 0
+  text-align: center
+  text-transform: uppercase
+  
+  
+$space_size: 5px
+$number_of_spaces: 50
+#gaia
+  border: 1px solid rgb(0,0,0)
+  margin: 0 auto 25px auto
+  width: $space_size * $number_of_spaces
+  height: $space_size * $number_of_spaces
+  .space
+    float: left
+    width: $space_size
+    height: $space_size  
+  .land
+    background-color: $land_no_life
+  .land.life
+    background-color: $land_life
+  .water
+    background-color: $water_no_life
+  .water.life
+    background-color: $water_life
+
+ul#time-controls
+  margin: 0 auto 25px auto
+  width: $space_size * $number_of_spaces
+  height: 50px
+  li
+    background-color: rgb(0,100,50)
+    color: rgb(255,255,255)
+    cursor: pointer
+    display: block
+    float: left
+    font-family: "Fanwood"
+    font-size: 20px
+    letter-spacing: 5px
+    line-height: 60px
+    text-align: center
+    text-transform: uppercase
+    height: 50px
+    width: 50%
+
+table
+  margin: 0 auto
+  tr
+    background-color: rgb(200,200,200)
+    th
+      text-align: right
+    td
+      text-align: left
+    th,
+    td
+      margin: 5px
+      padding: 5px

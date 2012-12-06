@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0; }
+
+h1#primary-title {
+  color: #003264;
+  font-family: "Fanwood";
+  font-size: 100px;
+  font-weight: 400;
+  line-height: 100px;
+  margin: 25px 0;
+  text-align: center;
+  text-transform: uppercase; }
+
+#gaia {
+  border: 1px solid black;
+  margin: 0 auto 25px auto;
+  width: 250px;
+  height: 250px; }
+  #gaia .space {
+    float: left;
+    width: 5px;
+    height: 5px; }
+  #gaia .land {
+    background-color: #323200; }
+  #gaia .land.life {
+    background-color: darkgreen; }
+  #gaia .water {
+    background-color: #000064; }
+  #gaia .water.life {
+    background-color: #003264; }
+
+ul#time-controls {
+  margin: 0 auto 25px auto;
+  width: 250px;
+  height: 50px; }
+  ul#time-controls li {
+    background-color: #006432;
+    color: white;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-family: "Fanwood";
+    font-size: 20px;
+    letter-spacing: 5px;
+    line-height: 60px;
+    text-align: center;
+    text-transform: uppercase;
+    height: 50px;
+    width: 50%; }
+
+table {
+  margin: 0 auto; }
+  table tr {
+    background-color: #c8c8c8; }
+    table tr th {
+      text-align: right; }
+    table tr td {
+      text-align: left; }
+    table tr th,
+    table tr td {
+      margin: 5px;
+      padding: 5px; }
