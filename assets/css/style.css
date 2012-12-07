@@ -19,8 +19,8 @@ h1#primary-title {
   height: 250px; }
   #gaia .space {
     float: left;
-    width: 5px;
-    height: 5px; }
+    width: 10px;
+    height: 10px; }
   #gaia .land {
     background-color: #323200; }
   #gaia .land.life {

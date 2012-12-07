@@ -26,8 +26,16 @@
         <td><%= temperature %></td>
       </tr>
       <tr>
-        <th>Total Number of Organisms</th>
+        <th>Number of Organisms</th>
         <td><%= organisms %></td>
+      </tr>
+      <tr>
+        <th>Number of Plants</th>
+        <td><%= plants %></td>
+      </tr>
+      <tr>
+        <th>Number of Animals</th>
+        <td><%= animals %></td>
       </tr>
     </script>
     <h1 id="primary-title">Gaia</h1>

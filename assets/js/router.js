@@ -10,13 +10,15 @@ $(document).ready( function() {
       window.info_table = new window.InfoTable({
         temperature: 0,
         organisms: 0,
+        plants: 0,
+        animals: 0,
         turn_counter: 0,
         co2: 300,
-        co2_decay_per_turn: 51,
+        co2_decay_per_turn: 50.75,
         median_solar_output: 3,
         solar_output_change: 1,
         chance_of_water: 0.51,
-        number_of_spaces: 50,
+        number_of_spaces: 25,
       });
       window.info_table_view = new window.InfoTableView({ model: window.info_table });
       window.gaia = new window.Gaia();

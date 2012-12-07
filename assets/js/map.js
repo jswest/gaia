@@ -82,29 +82,112 @@ $(document).ready( function() {
       spaces[randox][randoy].trigger( 'change:life' );
     },
     next_turn: function() {
-      var spaces_with_life = 0;
       var spaces = this.model.get( 'spaces' );
-      var organisms = [];
       var temperatures = [];
+      var organisms = [];
+      var plants = [];
+      var animals = [];
+      var co2 = window.info_table.get( 'co2' );
       for( var i = 0; i < spaces.length; i++ ) {
         for( var j = 0; j < spaces[i].length; j++ ) {
           
           var space = spaces[i][j]
           
-          // add this space's life to the organisms array.
-          if( space.get( 'life' ).length > 0 ) {
-            spaces_with_life++;
-            for( var q = 0; q < space.get( 'life' ).length; q++ ) {
-              organisms.push( space.get( 'life' )[q] );
-            }
-          }
-          
           // add this space's temperature to the temperatures array.
           temperatures.push( space.temperature() );
           
           // add or remove life if you can.
-          if( space.life_possible() == true ) {
-            space.add_life();
+          // If it can support life, and it's empty, add a plant.
+          if( space.life_possible() == true && space.get( 'life' ).length == 0 ) {
+            space.add_life( new BasicPlant() );
+                    
+          // Else if there's life, and it's not empty, eat and reproduce.   
+          } else if( space.life_possible() == true && space.get( 'life' ).length > 0 ) {
+            var existant_life = space.get( 'life' );
+            var life = [];
+            var life_in_chain = [ [], [] ]; 
+            
+            // let them eat cake/other animals
+            // first, sort them by chain...
+            for( var q = 0; q < existant_life.length; q++ ) {
+              var organism = existant_life[q];
+              var organism_chain_location = organism.get( 'chain_location' );
+              life_in_chain[organism_chain_location].push( organism );              
+            }
+
+            if( life_in_chain[1].length > 0 ) {
+              // then, iterate over the predators...
+              for( var q = 1; q < life_in_chain.length; q++ ) {
+                for( var r = 0; r < life_in_chain[q].length; r++ ) {
+              
+                  // and if they can eat, let them.
+                  var predator = life_in_chain[q][r]
+                  if( life_in_chain[q - 1].length > predator.get( 'eating_factor' ) ) {
+                    life_in_chain[q - 1].splice( 0, predator.get( 'eating_factor' ) );
+                    life.push( predator )
+                
+                  } // else it dies...
+                }
+              }
+            // Else (there are no predtors present)
+            } else {
+                            
+              // If plant life is of a signifigant enough complexity, add a new animal!
+              if( life_in_chain[0].length >= 4 ) {
+                life.push( new BasicAnimal() );
+              }
+            }
+                        
+            // now, push the remaining plant life.
+            for( var q = 0; q < life_in_chain[0].length; q++ ) {
+              life.push( life_in_chain[0][q] );
+            }
+            
+            // and be fruitful and multiply!
+            var new_life = [];
+            for( var q = 0; q < life.length; q++ ) {
+              var organism = life[q];
+              var rf = organism.get( 'reproduction_factor' );
+              for( var r = 0; r < rf; r++ ) {
+                if( organism.get( 'chain_location' ) == 0 ) {
+                  new_life.push( new BasicPlant() );
+                } else if( organism.get( 'chain_location' ) == 1 ) {
+                  new_life.push( new BasicAnimal() );
+                } else {
+                  // silence is golden.
+                }
+              }
+            }
+            
+            // kill the spare!
+            while( new_life.length > 40 ) {
+              var rando = Math.round( Math.random() * (new_life.length - 1) );
+              new_life.splice( rando, 1 );
+            }
+            
+            // housekeeping: deal with c02, and the organisms counter
+            for( var q = 0; q < new_life.length; q++ ) {
+              var organism = new_life[q];
+              if( organism.get( 'chain_location' ) == 0 ) {
+                plants.push( organism );
+              } else if( organism.get( 'chain_location' ) == 1 ) {
+                animals.push( organism );
+              } else {
+                // silence is golden
+              }
+              organisms.push( organism );
+              if( space.get( 'is_water_space') == true ) {
+                co2 = co2 + organism.get( 'water_co2_output_per_turn' );
+                co2 = co2 - organism.get( 'water_co2_fixing_per_turn' );
+              } else {
+                co2 = co2 + organism.get( 'land_co2_output_per_turn' );
+                co2 = co2 - organism.get( 'land_co2_fixing_per_turn' );             
+              }
+            }
+            
+            space.set( 'life', new_life );
+            space.trigger( 'change:life' );
+            
           } else {
             space.set( 'life', [] );
             space.trigger( 'change:life' );
@@ -119,21 +202,18 @@ $(document).ready( function() {
       }
       var average_temperature = rt / temperatures.length;
       window.info_table.set( 'temperature', average_temperature );
-      
-      // get and print the co2 level. 
-      var added_co2 = 0;
-      for( i = 0; i < organisms.length; i++ ) {
-        added_co2 = added_co2 + organisms[i].get( 'co2_output_per_turn' )
-      }
-      var co2 = window.info_table.get( 'co2' );
-      var decay = window.info_table.get( 'co2_decay_per_turn' );
-      co2 = co2 + added_co2 - decay;
       window.info_table.set( 'co2', co2 );
       window.info_table.set( 'organisms', organisms.length );
+      window.info_table.set( 'plants', plants.length );
+      window.info_table.set( 'animals', animals.length );
       window.info_table_view.render();
     }
   });
   window.Space = Backbone.Model.extend({
+    events: {
+      'mouseover': 'mouseover_event'
+      'mouseout': 'mouseout_event'
+    }
     initialize: function() {
       _.bindAll( this, 'temperature', 'life_possible' );
       if( Math.random() <= window.info_table.get( 'chance_of_water' ) ) {
@@ -161,10 +241,16 @@ $(document).ready( function() {
         return true;
       }
     },
-    add_life: function() {
+    add_life: function( life_object ) {
       var life = []
-      this.get( 'life' ).push( new window.BasicPlant() );
+      this.get( 'life' ).push( life_object );
       this.trigger( 'change:life' );
+    },
+    mouseover_event: function() {
+      
+    },
+    mouseout_event: function() {
+      
     }
   });
   window.SpaceView = Backbone.View.extend({
@@ -197,7 +283,24 @@ $(document).ready( function() {
   });
   window.BasicPlant = Backbone.Model.extend({
     defaults: {
-      co2_output_per_turn: 0.0096
+      chain_location: 0,
+      land_co2_fixing_per_turn: 0.0005,
+      water_co2_fixing_per_turn: 0.00025,
+      land_co2_output_per_turn: 0,
+      water_co2_output_per_turn: 0,
+      reproduction_factor: 3,
+      eating_factor: 0 
+    }
+  });
+  window.BasicAnimal = Backbone.Model.extend({
+    defaults: {
+      chain_location: 1,
+      land_co2_fixing_per_turn: 0,
+      water_co2_fixing_per_turn: 0,
+      land_co2_output_per_turn: 0.001,
+      water_co2_output_per_turn: 0.0005,
+      reproduction_factor: 2,
+      eating_factor: 2
     }
   });
 });
